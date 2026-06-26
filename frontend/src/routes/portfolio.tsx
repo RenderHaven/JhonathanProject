@@ -18,8 +18,15 @@ export const Route = createFileRoute("/portfolio")({
 function Portfolio() {
   const { data: catsRes } = useQuery({ queryKey: ["cats"], queryFn: () => api.listCategories() });
   const { data: imgRes } = useQuery({ queryKey: ["images"], queryFn: () => api.listImages() });
-  const categories = catsRes?.data ?? [];
-  const images = imgRes?.data ?? [];
+  const rawCategories = catsRes?.data ?? [];
+  const rawImages = imgRes?.data ?? [];
+
+  const activeCategories = useMemo(() => rawCategories.filter((c) => c.is_active), [rawCategories]);
+  const activeCategoryIds = useMemo(() => new Set(activeCategories.map((c) => c.id)), [activeCategories]);
+  const images = useMemo(
+    () => rawImages.filter((i) => i.is_active && activeCategoryIds.has(i.category_id)),
+    [rawImages, activeCategoryIds],
+  );
 
   const [active, setActive] = useState<number | "all">("all");
   const [lightbox, setLightbox] = useState<number | null>(null);
@@ -55,7 +62,7 @@ function Portfolio() {
           <FilterChip active={active === "all"} onClick={() => setActive("all")}>
             All ({images.length})
           </FilterChip>
-          {categories.map((c) => {
+          {activeCategories.map((c) => {
             const count = images.filter((i) => i.category_id === c.id).length;
             return (
               <FilterChip key={c.id} active={active === c.id} onClick={() => setActive(c.id)}>

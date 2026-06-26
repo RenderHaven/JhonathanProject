@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Trash2, Upload, GripVertical } from "lucide-react";
+import { Trash2, Upload, GripVertical, Pencil, X } from "lucide-react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { api, type PortfolioImage } from "@/lib/api";
 import { useDragReorder } from "@/lib/dnd";
@@ -21,6 +21,10 @@ function AdminPortfolio() {
   const [categoryId, setCategoryId] = useState<number | "">("");
   const [caption, setCaption] = useState("");
   const [filter, setFilter] = useState<number | "all">("all");
+
+  const [editing, setEditing] = useState<PortfolioImage | null>(null);
+  const [editCaption, setEditCaption] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState<number | "">("");
 
   const upload = useMutation({
     mutationFn: () => api.uploadImage(file!, Number(categoryId), caption || undefined),
@@ -55,6 +59,22 @@ function AdminPortfolio() {
       toast.success("Status changed");
       qc.invalidateQueries({ queryKey: ["images"] });
     },
+  });
+
+  const update = useMutation({
+    mutationFn: (img: PortfolioImage) =>
+      api.updateImage(img.id, {
+        caption: editCaption,
+        category_id: editCategoryId ? Number(editCategoryId) : undefined,
+      }),
+    onSuccess: () => {
+      toast.success("Image updated");
+      setEditing(null);
+      setEditCaption("");
+      setEditCategoryId("");
+      qc.invalidateQueries({ queryKey: ["images"] });
+    },
+    onError: (e) => toast.error((e as Error).message),
   });
 
   const categories = cats.data?.data ?? [];
@@ -154,15 +174,73 @@ function AdminPortfolio() {
               </div>
               <button
                 onClick={() => { if (confirm("Delete this image?")) del.mutate(img.id); }}
-                className="absolute right-2 top-2 rounded-full bg-background/90 p-2 opacity-0 transition group-hover:opacity-100"
+                className="absolute right-2 top-10 rounded-full bg-background/90 p-2 opacity-0 transition group-hover:opacity-100"
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setEditing(img);
+                  setEditCaption(img.caption ?? "");
+                  setEditCategoryId(img.category_id);
+                }}
+                className="absolute right-2 top-2 rounded-full bg-background/90 p-2 opacity-0 transition group-hover:opacity-100"
+              >
+                <Pencil className="h-4 w-4" />
               </button>
             </div>
           );
         })}
         {images.length === 0 && <p className="col-span-full p-6 text-center text-muted-foreground">No images.</p>}
       </div>
+
+      {editing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => !update.isPending && setEditing(null)}>
+          <div className="w-full max-w-md rounded-xl border bg-card p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Edit Image</h2>
+              <button onClick={() => setEditing(null)} className="rounded-md p-1 hover:bg-accent" disabled={update.isPending}>
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Caption</label>
+                <input
+                  className={cls}
+                  value={editCaption}
+                  onChange={(e) => setEditCaption(e.target.value)}
+                  placeholder="Image caption"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-muted-foreground">Category</label>
+                <select
+                  className={cls}
+                  value={editCategoryId}
+                  onChange={(e) => setEditCategoryId(e.target.value ? Number(e.target.value) : "")}
+                >
+                  <option value="">Select category…</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button onClick={() => setEditing(null)} className="rounded-lg border px-4 py-2 text-sm" disabled={update.isPending}>Cancel</button>
+                <button
+                  onClick={() => { if (editing) update.mutate(editing); }}
+                  disabled={update.isPending}
+                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+                >
+                  {update.isPending ? "Saving…" : "Save changes"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

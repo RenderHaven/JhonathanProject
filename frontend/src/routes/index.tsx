@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { ArrowRight, Camera, Heart, Sparkles } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { api } from "@/lib/api";
@@ -28,7 +29,19 @@ function Home() {
     queryKey: ["images"],
     queryFn: () => api.listImages(),
   });
-  const images = (imagesRes?.data ?? []).slice(0, 6);
+  const { data: catsRes } = useQuery({
+    queryKey: ["cats"],
+    queryFn: () => api.listCategories(),
+  });
+  const rawImages = imagesRes?.data ?? [];
+  const activeCategoryIds = useMemo(
+    () => new Set((catsRes?.data ?? []).filter((c) => c.is_active).map((c) => c.id)),
+    [catsRes?.data],
+  );
+  const images = useMemo(
+    () => rawImages.filter((i) => i.is_active && activeCategoryIds.has(i.category_id)).slice(0, 6),
+    [rawImages, activeCategoryIds],
+  );
 
   return (
     <SiteLayout>
