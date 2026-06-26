@@ -132,7 +132,7 @@ function Checkout() {
 }
 
 const inputCls =
-  "w-full rounded-xl border border-border/60 bg-background/40 px-4 py-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30";
+  "w-full text-white rounded-xl border border-border/60 bg-background/40 px-4 py-3 text-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

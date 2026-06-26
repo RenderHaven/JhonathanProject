@@ -2,6 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { api } from "@/lib/api";
 
@@ -33,7 +39,7 @@ function Contact() {
         email: form.email,
         phone: form.phone || null,
         event_name: form.event_name || null,
-        event_date: form.event_date ? new Date(form.event_date).toISOString() : null,
+        event_date: form.event_date ? new Date(form.event_date + "T00:00:00").toISOString() : null,
         message: form.message || null,
       });
       toast.success("Thanks — your inquiry has been received.");
@@ -76,7 +82,32 @@ function Contact() {
             <label className="block"><span className="mb-1.5 block text-xs uppercase tracking-wider text-muted-foreground">Event name</span>
               <input value={form.event_name} onChange={(e) => setForm({ ...form, event_name: e.target.value })} className={cls} /></label>
             <label className="block"><span className="mb-1.5 block text-xs uppercase tracking-wider text-muted-foreground">Event date</span>
-              <input type="datetime-local" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} className={cls} /></label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal rounded-xl border border-border/60 bg-background/40 px-4 py-3 text-sm hover:bg-background/60",
+                      !form.event_date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" color="white" />
+                    {form.event_date ? format(new Date(form.event_date + "T00:00:00"), "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={form.event_date ? new Date(form.event_date + "T00:00:00") : undefined}
+                    onSelect={(date) =>
+                      setForm({ ...form, event_date: date ? format(date, "yyyy-MM-dd") : "" })
+                    }
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </label>
           </div>
           <label className="block"><span className="mb-1.5 block text-xs uppercase tracking-wider text-muted-foreground">Message</span>
             <textarea rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={cls} /></label>
