@@ -32,39 +32,53 @@
   --color-brand: var(--brand);
   --color-brand-2: var(--brand-2);
   --color-brand-foreground: var(--brand-foreground);
-  --font-display: "Playfair Display", Georgia, serif;
-  --font-sans: "Inter", system-ui, sans-serif;
+  --color-gold: var(--gold);
+  --color-charcoal: var(--charcoal);
+  --color-beige: var(--beige);
+  --color-forest: var(--forest);
+  --font-display: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+  --font-sans: "Inter Variable", "Inter", system-ui, sans-serif;
 }
 
 :root {
-  --radius: 0.75rem;
-  /* Public site: deep cinematic dark with vibrant blue->purple */
-  --background: oklch(0.16 0.03 270);
-  --foreground: oklch(0.98 0.005 270);
-  --card: oklch(0.21 0.035 270);
-  --card-foreground: oklch(0.98 0.005 270);
-  --popover: oklch(0.21 0.035 270);
-  --popover-foreground: oklch(0.98 0.005 270);
-  --primary: oklch(0.65 0.22 275);
-  --primary-foreground: oklch(0.99 0.005 270);
-  --secondary: oklch(0.27 0.04 270);
-  --secondary-foreground: oklch(0.98 0.005 270);
-  --muted: oklch(0.25 0.03 270);
-  --muted-foreground: oklch(0.7 0.03 270);
-  --accent: oklch(0.55 0.25 305);
-  --accent-foreground: oklch(0.99 0.005 270);
-  --destructive: oklch(0.6 0.24 25);
-  --destructive-foreground: oklch(0.99 0.005 270);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 12%);
-  --ring: oklch(0.65 0.22 275);
-  --brand: oklch(0.62 0.24 265);
-  --brand-2: oklch(0.6 0.26 310);
-  --brand-foreground: oklch(0.99 0.005 270);
-  --gradient-brand: linear-gradient(135deg, oklch(0.62 0.24 265), oklch(0.6 0.26 310));
-  --gradient-brand-soft: linear-gradient(135deg, oklch(0.62 0.24 265 / 0.15), oklch(0.6 0.26 310 / 0.15));
-  --shadow-glow: 0 20px 60px -20px oklch(0.62 0.24 265 / 0.5);
-  --shadow-elegant: 0 30px 80px -30px oklch(0.16 0.03 270 / 0.8);
+  --radius: 1rem;
+  /* Luxury editorial: warm white, deep charcoal, champagne gold */
+  --background: oklch(0.984 0.005 80);      /* #FAF9F6 warm white */
+  --foreground: oklch(0.18 0.005 270);      /* #111111 charcoal */
+  --card: oklch(0.96 0.006 80);             /* #F4F1EC soft beige */
+  --card-foreground: oklch(0.18 0.005 270);
+  --popover: oklch(0.99 0.003 80);
+  --popover-foreground: oklch(0.18 0.005 270);
+  --primary: oklch(0.18 0.005 270);
+  --primary-foreground: oklch(0.984 0.005 80);
+  --secondary: oklch(0.94 0.008 80);
+  --secondary-foreground: oklch(0.18 0.005 270);
+  --muted: oklch(0.95 0.006 80);
+  --muted-foreground: oklch(0.5 0.01 80);   /* stone gray */
+  --accent: oklch(0.76 0.08 78);            /* champagne gold */
+  --accent-foreground: oklch(0.18 0.005 270);
+  --destructive: oklch(0.55 0.2 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.18 0.005 270 / 10%);
+  --input: oklch(0.18 0.005 270 / 12%);
+  --ring: oklch(0.76 0.08 78);
+
+  /* Brand / luxury tokens */
+  --gold: oklch(0.76 0.08 78);              /* #C8A96A */
+  --gold-soft: oklch(0.85 0.05 80);
+  --charcoal: oklch(0.18 0.005 270);
+  --beige: oklch(0.96 0.006 80);
+  --forest: oklch(0.32 0.04 160);           /* #23352D */
+  --stone: oklch(0.5 0.01 80);
+
+  /* Legacy brand tokens remapped to gold so existing classes still read luxurious */
+  --brand: oklch(0.76 0.08 78);
+  --brand-2: oklch(0.68 0.07 70);
+  --brand-foreground: oklch(0.16 0.005 270);
+  --gradient-brand: linear-gradient(135deg, oklch(0.78 0.08 80), oklch(0.66 0.08 70));
+  --gradient-brand-soft: linear-gradient(135deg, oklch(0.76 0.08 78 / 0.12), oklch(0.66 0.08 70 / 0.08));
+  --shadow-glow: 0 24px 60px -28px oklch(0.18 0.005 270 / 0.25);
+  --shadow-elegant: 0 40px 80px -40px oklch(0.18 0.005 270 / 0.35);
 }
 
 /* Admin scope: clean light dashboard look */
@@ -99,10 +113,15 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv11";
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    letter-spacing: -0.02em;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+  html {
+    scroll-behavior: smooth;
   }
 }
 
@@ -123,4 +142,42 @@
 
 @utility shadow-glow {
   box-shadow: var(--shadow-glow);
+}
+
+@utility shadow-elegant {
+  box-shadow: var(--shadow-elegant);
+}
+
+@utility text-gold {
+  color: var(--gold);
+}
+
+@utility bg-gold {
+  background-color: var(--gold);
+}
+
+@utility border-gold {
+  border-color: var(--gold);
+}
+
+@utility tracking-luxury {
+  letter-spacing: 0.32em;
+}
+
+@keyframes fade-up {
+  0% { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@utility animate-fade-up {
+  animation: fade-up 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes ken-burns {
+  0% { transform: scale(1.05); }
+  100% { transform: scale(1.18); }
+}
+
+@utility animate-ken-burns {
+  animation: ken-burns 18s ease-in-out infinite alternate;
 }

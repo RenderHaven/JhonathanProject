@@ -10,6 +10,7 @@ const NAV: Array<{ to: string; label: string; icon: typeof LayoutDashboard; exac
   { to: "/admin/portfolio", label: "Portfolio", icon: ImageIcon },
   { to: "/admin/categories", label: "Categories", icon: Tag },
   { to: "/admin/services", label: "Services", icon: Briefcase },
+  { to: "/", label: "View Site", icon: ExternalLink },
   { to: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
 ];
 
