@@ -78,3 +78,14 @@ def get_current_admin(
             detail="Admin not found or deactivated.",
         )
     return admin
+
+optional_security = HTTPBearer(auto_error=False)
+
+def get_current_admin_optional(
+    credentials: HTTPAuthorizationCredentials | None = Depends(optional_security),
+    db: Session = Depends(get_db),
+) -> Optional[Admin]:
+    if credentials is None:
+        return None
+
+    return get_current_admin(credentials, db)

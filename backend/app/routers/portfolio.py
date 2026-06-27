@@ -17,7 +17,7 @@ from app.schemas.portfolio import (
     ImageReorderRequest,
 )
 from app.schemas.common import APIResponse, PaginatedResponse
-from app.utils.auth import get_current_admin
+from app.utils.auth import get_current_admin,get_current_admin_optional
 from app.utils.cloudinary import upload_image, delete_image
 
 router = APIRouter(prefix="/portfolio/images", tags=["Portfolio Images"])
@@ -76,14 +76,23 @@ def get_images(
     page: int = 1,
     limit: int = 20,
     db: Session = Depends(get_db),
+    admin: Admin | None = Depends(get_current_admin_optional),
 ):
     """List portfolio images with optional category filter and pagination."""
+
     query = db.query(PortfolioImage)
+
+    if admin is None:
+        query = query.join(Category).filter(
+            PortfolioImage.is_active == True,
+            Category.is_active == True,
+        )
 
     if category_id:
         query = query.filter(PortfolioImage.category_id == category_id)
 
     total = query.count()
+
     images = (
         query.order_by(PortfolioImage.display_order)
         .offset((page - 1) * limit)
@@ -92,7 +101,10 @@ def get_images(
     )
 
     return PaginatedResponse(
-        data=[PortfolioImageResponse.model_validate(img).model_dump() for img in images],
+        data=[
+            PortfolioImageResponse.model_validate(img).model_dump()
+            for img in images
+        ],
         page=page,
         limit=limit,
         total=total,

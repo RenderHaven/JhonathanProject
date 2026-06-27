@@ -109,7 +109,7 @@ export const api = {
   logout: () => request("/auth/logout", { method: "POST", auth: true }),
 
   // Categories
-  listCategories: () => request<Category[]>("/categories"),
+  listCategories: (auth: boolean = false) => request<Category[]>("/categories", { auth }),
   createCategory: (name: string) =>
     request<Category>("/categories", {
       method: "POST",
@@ -129,7 +129,7 @@ export const api = {
     request(`/categories/${id}`, { method: "DELETE", auth: true }),
 
   // Portfolio
-  listImages: () => request<PortfolioImage[]>("/portfolio/images"),
+  listImages: (auth: boolean = false) => request<PortfolioImage[]>("/portfolio/images", { auth }),
   uploadImage: (file: File, category_id: number, caption?: string) => {
     const fd = new FormData();
     fd.append("image", file);

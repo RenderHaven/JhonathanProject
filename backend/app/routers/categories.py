@@ -12,19 +12,35 @@ from app.models.admin import Admin
 from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from app.schemas.common import APIResponse
-from app.utils.auth import get_current_admin
+from app.utils.auth import get_current_admin,get_current_admin_optional
 
 router = APIRouter(prefix="/categories", tags=["Categories"])
 
 
+from typing import Optional
+from fastapi import Depends
+
 @router.get("", response_model=APIResponse)
-def get_categories(db: Session = Depends(get_db)):
-    """Get all categories ordered by display_order."""
-    categories = db.query(Category).order_by(Category.display_order).all()
+def get_categories(
+    db: Session = Depends(get_db),
+    admin: Optional[Admin] = Depends(get_current_admin_optional),  # Optional auth
+):
+    """Get categories. Admin gets all, public gets only active ones."""
+
+    query = db.query(Category)
+
+    if admin is None:
+        query = query.filter(Category.is_active == True)
+
+    categories = query.order_by(Category.display_order).all()
+
     return APIResponse(
         success=True,
         message="Categories fetched successfully.",
-        data=[CategoryResponse.model_validate(c).model_dump() for c in categories],
+        data=[
+            CategoryResponse.model_validate(c).model_dump()
+            for c in categories
+        ],
     )
 
 

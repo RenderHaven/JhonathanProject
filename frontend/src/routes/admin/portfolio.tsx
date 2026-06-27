@@ -14,8 +14,8 @@ export const Route = createFileRoute("/admin/portfolio")({
 
 function AdminPortfolio() {
   const qc = useQueryClient();
-  const cats = useQuery({ queryKey: ["cats"], queryFn: () => api.listCategories() });
-  const imgs = useQuery({ queryKey: ["images"], queryFn: () => api.listImages() });
+  const cats = useQuery({ queryKey: ["cats"], queryFn: () => api.listCategories(true) });
+  const imgs = useQuery({ queryKey: ["images"], queryFn: () => api.listImages(true) });
 
   const [file, setFile] = useState<File | null>(null);
   const [categoryId, setCategoryId] = useState<number | "">("");

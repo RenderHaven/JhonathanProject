@@ -14,7 +14,7 @@ export const Route = createFileRoute("/admin/categories")({
 
 function Categories() {
   const qc = useQueryClient();
-  const { data } = useQuery({ queryKey: ["cats"], queryFn: () => api.listCategories() });
+  const { data } = useQuery({ queryKey: ["cats"], queryFn: () => api.listCategories(true) });
   const cats = (data?.data ?? []).slice().sort((a, b) => a.display_order - b.display_order);
 
   const [draftOpen, setDraftOpen] = useState(false);
